@@ -190,7 +190,7 @@ Nodelets
         - `/rosout` *(rosgraph_msgs/Log)*: Console output
         - `/time` *(novatel_gps_msgs/Time)*: [TIME](http://docs.novatel.com/OEM7/Content/Logs/TIME.htm) logs
         - `/trackstat` *(novatel_gps_msgs/Trackstat)*: [TRACKSTAT](http://docs.novatel.com/OEM7/Content/Logs/TRACKSTAT.htm) logs
-        - `gps/nova/current_pose` *(geometry_msgs/PoseStamped)*: UTM-based porition + orientation
+        - `gps/nova/current_pose` *(geometry_msgs/PoseStamped)*: UTM-based position + orientation
 
 Adding New Logs
 ---------------
