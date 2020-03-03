@@ -158,8 +158,10 @@
 #include <novatel_gps_msgs/Inspvax.h>
 #include <novatel_gps_driver/novatel_gps.h>
 #include <ros/ros.h>
+#include <tf2/LinearMath/Quaternion.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <std_msgs/Time.h>
 #include <swri_math_util/math_util.h>
 #include <swri_roscpp/parameters.h>
@@ -273,9 +275,9 @@ namespace novatel_gps_driver
 
       sync_sub_ = swri::Subscriber(node, "gps_sync", 100, &NovatelGpsNodelet::SyncCallback, this);
 
-      std::string gps_topic = node.resolveName("gps");
+      std::string gps_topic = node.resolveName("gps/nova/gps");
       gps_pub_ = swri::advertise<gps_common::GPSFix>(node, gps_topic, 100);
-      fix_pub_ = swri::advertise<sensor_msgs::NavSatFix>(node, "fix", 100);
+      fix_pub_ = swri::advertise<sensor_msgs::NavSatFix>(node, "gps/nova/fix", 100);
 
       if (publish_clock_steering_)
       {
@@ -295,12 +297,12 @@ namespace novatel_gps_driver
 
       if (publish_imu_messages_)
       {
-        imu_pub_ = swri::advertise<sensor_msgs::Imu>(node, "imu", 100);
-        novatel_imu_pub_= swri::advertise<novatel_gps_msgs::NovatelCorrectedImuData>(node, "corrimudata", 100);
-        insstdev_pub_ = swri::advertise<novatel_gps_msgs::Insstdev>(node, "insstdev", 100);
-        inspva_pub_ = swri::advertise<novatel_gps_msgs::Inspva>(node, "inspva", 100);
-        inspvax_pub_ = swri::advertise<novatel_gps_msgs::Inspvax>(node, "inspvax", 100);
-        inscov_pub_ = swri::advertise<novatel_gps_msgs::Inscov>(node, "inscov", 100);
+        imu_pub_ = swri::advertise<sensor_msgs::Imu>(node, "gps/nova/imu", 100);
+        novatel_imu_pub_= swri::advertise<novatel_gps_msgs::NovatelCorrectedImuData>(node, "gps/nova/corrimudata", 100);
+        insstdev_pub_ = swri::advertise<novatel_gps_msgs::Insstdev>(node, "gps/nova/insstdev", 100);
+        inspva_pub_ = swri::advertise<novatel_gps_msgs::Inspva>(node, "gps/nova/inspva", 100);
+        inspvax_pub_ = swri::advertise<novatel_gps_msgs::Inspvax>(node, "gps/nova/inspvax", 100);
+        inscov_pub_ = swri::advertise<novatel_gps_msgs::Inscov>(node, "gps/nova/inscov", 100);
       }
 
       if (publish_gpgsv_)
@@ -325,17 +327,18 @@ namespace novatel_gps_driver
 
       if (publish_novatel_utm_positions_)
       { 
-        novatel_utm_pub_ = swri::advertise<novatel_gps_msgs::NovatelUtmPosition>(node, "bestutm", 100);
+        novatel_utm_pub_ = swri::advertise<novatel_gps_msgs::NovatelUtmPosition>(node, "gps/nova/bestutm", 100);
+        novatel_utm_pub_pose_ = swri::advertise<geometry_msgs::PoseStamped>(node, "gps/nova/current_pose", 100);
       }
 
       if (publish_novatel_velocity_)
       {
-        novatel_velocity_pub_ = swri::advertise<novatel_gps_msgs::NovatelVelocity>(node, "bestvel", 100);
+        novatel_velocity_pub_ = swri::advertise<novatel_gps_msgs::NovatelVelocity>(node, "gps/nova/bestvel", 100);
       }
 
       if (publish_novatel_heading2_)
       {
-	novatel_heading2_pub_ = swri::advertise<novatel_gps_msgs::NovatelHeading2>(node, "heading2", 100);
+	novatel_heading2_pub_ = swri::advertise<novatel_gps_msgs::NovatelHeading2>(node, "gps/nova/heading2", 100);
       }
 
       if (publish_novatel_dual_antenna_heading_)
@@ -601,6 +604,7 @@ namespace novatel_gps_driver
     ros::Publisher novatel_position_pub_;
     ros::Publisher novatel_xyz_position_pub_;
     ros::Publisher novatel_utm_pub_;
+    ros::Publisher novatel_utm_pub_pose_;
     ros::Publisher novatel_velocity_pub_;
     ros::Publisher novatel_heading2_pub_;
     ros::Publisher novatel_dual_antenna_heading_pub_;
@@ -620,7 +624,9 @@ namespace novatel_gps_driver
 
     boost::thread thread_;
     boost::mutex mutex_;
-
+    
+    /// pose message
+    geometry_msgs::PoseStamped pose;
     /// Subscriber to listen for sync times from a DIO
     swri::Subscriber sync_sub_;
     ros::Time last_sync_;
@@ -858,9 +864,13 @@ namespace novatel_gps_driver
         gps_.GetNovatelUtmPositions(utm_msgs);
         for (const auto& msg : utm_msgs)
         {
+          pose.pose.position.x = msg->easting;
+          pose.pose.position.y = msg->northing;
           msg->header.stamp += sync_offset;
+          pose.header.stamp = msg->header.stamp;
           msg->header.frame_id = frame_id_;
           novatel_utm_pub_.publish(msg);
+          novatel_utm_pub_pose_.publish(pose);
         }
       }
 
@@ -870,8 +880,15 @@ namespace novatel_gps_driver
         gps_.GetNovatelHeading2Messages(heading2_msgs);
         for (const auto& msg : heading2_msgs)
         {
+          tf2::Quaternion oriQuater;
+          oriQuater.setRPY( 0, msg->pitch, msg->heading ); 
+          oriQuater.normalize();
           msg->header.stamp += sync_offset;
           msg->header.frame_id = frame_id_;
+          pose.pose.orientation.w = oriQuater.getW();
+          pose.pose.orientation.x = oriQuater.getX();
+          pose.pose.orientation.x = oriQuater.getY();
+          pose.pose.orientation.z = oriQuater.getZ();
           novatel_heading2_pub_.publish(msg);
         }
       }

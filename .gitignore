@@ -10,3 +10,7 @@ lib/
 build/
 .idea/
 cmake-build-debug/
+
+# VS code 
+c_cpp_properties.json
+settings.json

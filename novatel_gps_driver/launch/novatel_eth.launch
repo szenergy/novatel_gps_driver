@@ -4,18 +4,21 @@
         pkg="nodelet" type="nodelet"
         args="standalone novatel_gps_driver/novatel_gps_nodelet">
     <rosparam>
-      verbose: true
+      verbose: false
+      publish_diagnostics: false
       connection_type: tcp
-      device: 192.168.74.10:2000
+      device: 192.168.1.223:3002
       imu_sample_rate: -1
       use_binary_messages: true
-      publish_novatel_positions: true
+      publish_novatel_positions: false
       publish_imu_messages: true
       publish_imu: true
       publish_novatel_velocity: true
-      imu_frame_id: /imu
-      publish_nmea_messages: true
-      frame_id: /gps
+      publish_novatel_utm_positions: true
+      imu_frame_id: /gps/novatel/imu
+      publish_novatel_heading2: true
+      publish_nmea_messages: false
+      frame_id: novatel
     </rosparam>
   </node>
 </launch>
