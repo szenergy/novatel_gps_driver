@@ -50,6 +50,7 @@
 #include <novatel_gps_msgs/Gprmc.h>
 #include <novatel_gps_msgs/Inspva.h>
 #include <novatel_gps_msgs/Inspvax.h>
+#include <novatel_gps_msgs/Insattqs.h>
 #include <novatel_gps_msgs/Insstdev.h>
 #include <novatel_gps_msgs/NovatelCorrectedImuData.h>
 #include <novatel_gps_msgs/NovatelPosition.h>
@@ -77,6 +78,7 @@
 #include <novatel_gps_driver/parsers/dual_antenna_heading.h>
 #include <novatel_gps_driver/parsers/inspva.h>
 #include <novatel_gps_driver/parsers/inspvax.h>
+#include <novatel_gps_driver/parsers/insattqs.h>
 #include <novatel_gps_driver/parsers/insstdev.h>
 #include <novatel_gps_driver/parsers/range.h>
 #include <novatel_gps_driver/parsers/time.h>
@@ -215,6 +217,12 @@ namespace novatel_gps_driver
        * @brief Provides any INSSTDEV messages that have been received since the last
        * time this was called.
        * @param[out] insstdev_messages New INSSTDEV messages.
+       */
+      void GetInsattqsMessages(std::vector<novatel_gps_msgs::InsattqsPtr>& insattqs_messages);
+      /**
+       * @brief Provides any INSATTQSX messages that have been received since the last
+       * time this was called.
+       * @param[out] insattqsx_messages New INSATTQSX messages.
        */
       void GetInsstdevMessages(std::vector<novatel_gps_msgs::InsstdevPtr>& insstdev_messages);
       /**
@@ -485,6 +493,7 @@ namespace novatel_gps_driver
       InscovParser inscov_parser_;
       InspvaParser inspva_parser_;
       InspvaxParser inspvax_parser_;
+      InsattqsParser insattqs_parser_;
       InsstdevParser insstdev_parser_;
       RangeParser range_parser_;
       TimeParser time_parser_;
@@ -504,6 +513,7 @@ namespace novatel_gps_driver
       boost::circular_buffer<novatel_gps_msgs::InscovPtr> inscov_msgs_;
       boost::circular_buffer<novatel_gps_msgs::InspvaPtr> inspva_msgs_;
       boost::circular_buffer<novatel_gps_msgs::InspvaxPtr> inspvax_msgs_;
+      boost::circular_buffer<novatel_gps_msgs::InsattqsPtr> insattqs_msgs_;
       boost::circular_buffer<novatel_gps_msgs::InsstdevPtr> insstdev_msgs_;
       boost::circular_buffer<novatel_gps_msgs::NovatelPositionPtr> novatel_positions_;
       boost::circular_buffer<novatel_gps_msgs::NovatelXYZPtr> novatel_xyz_positions_;
@@ -519,6 +529,7 @@ namespace novatel_gps_driver
       // IMU data synchronization queues
       std::queue<novatel_gps_msgs::NovatelCorrectedImuDataPtr> corrimudata_queue_;
       std::queue<novatel_gps_msgs::InspvaPtr> inspva_queue_;
+      std::queue<novatel_gps_msgs::InsattqsPtr> insattqs_queue_;
       novatel_gps_msgs::InsstdevPtr latest_insstdev_;
       novatel_gps_msgs::InscovPtr latest_inscov_;
       double imu_rate_;

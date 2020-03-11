@@ -66,6 +66,8 @@ namespace novatel_gps_driver
       inscov_msgs_(MAX_BUFFER_SIZE),
       inspva_msgs_(MAX_BUFFER_SIZE),
       inspvax_msgs_(MAX_BUFFER_SIZE),
+      insattqs_msgs_(MAX_BUFFER_SIZE),
+      insattqs_msgs_(MAX_BUFFER_SIZE),
       insstdev_msgs_(MAX_BUFFER_SIZE),
       novatel_positions_(MAX_BUFFER_SIZE),
       novatel_xyz_positions_(MAX_BUFFER_SIZE),
@@ -532,6 +534,13 @@ namespace novatel_gps_driver
     inspvax_messages.clear();
     inspvax_messages.insert(inspvax_messages.end(), inspvax_msgs_.begin(), inspvax_msgs_.end());
     inspvax_msgs_.clear();
+  }
+
+  void NovatelGps::GetInsattqsMessages(std::vector<novatel_gps_msgs::InsattqsPtr>& insattqs_messages)
+  {
+    insattqs_messages.clear();
+    insattqs_messages.insert(insattqs_messages.end(), insattqs_msgs_.begin(), insattqs_msgs_.end());
+    insattqs_msgs_.clear();
   }
 
   void NovatelGps::GetInsstdevMessages(std::vector<novatel_gps_msgs::InsstdevPtr>& insstdev_messages)
@@ -1327,6 +1336,12 @@ namespace novatel_gps_driver
       inspvax->header.stamp = stamp;
       inspvax_msgs_.push_back(inspvax);
     }
+    else if (sentence.id == "INSATTQSA")
+    {
+      novatel_gps_msgs::InsattqsPtr insattqs = insattqs_parser_.ParseAscii(sentence);
+      insattqs->header.stamp = stamp;
+      insattqs_msgs_.push_back(insattqs);
+    }    
     else if (sentence.id == "INSSTDEVA")
     {
       novatel_gps_msgs::InsstdevPtr insstdev = insstdev_parser_.ParseAscii(sentence);
