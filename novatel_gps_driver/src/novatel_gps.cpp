@@ -67,7 +67,6 @@ namespace novatel_gps_driver
       inspva_msgs_(MAX_BUFFER_SIZE),
       inspvax_msgs_(MAX_BUFFER_SIZE),
       insattqs_msgs_(MAX_BUFFER_SIZE),
-      insattqs_msgs_(MAX_BUFFER_SIZE),
       insstdev_msgs_(MAX_BUFFER_SIZE),
       novatel_positions_(MAX_BUFFER_SIZE),
       novatel_xyz_positions_(MAX_BUFFER_SIZE),
@@ -1139,6 +1138,13 @@ namespace novatel_gps_driver
         inspvax_msgs_.push_back(inspvax);
         break;
       }
+      case InsattqsParser::MESSAGE_ID:
+      {
+        novatel_gps_msgs::InsattqsPtr insattqs = insattqs_parser_.ParseBinary(msg);
+        insattqs->header.stamp = stamp;
+        insattqs_msgs_.push_back(insattqs);
+        break;
+      }      
       case InsstdevParser::MESSAGE_ID:
       {
         novatel_gps_msgs::InsstdevPtr insstdev = insstdev_parser_.ParseBinary(msg);
