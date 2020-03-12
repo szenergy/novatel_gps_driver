@@ -38,6 +38,7 @@
 
 #include <gtest/gtest.h>
 #include <novatel_gps_driver/parsers/inspva.h>
+#include <novatel_gps_driver/parsers/insattqs.h>
 #include <novatel_gps_driver/parsers/insstdev.h>
 #include <novatel_gps_driver/parsers/corrimudata.h>
 #include <novatel_gps_driver/parsers/inscov.h>
@@ -345,6 +346,45 @@ TEST(ParserTestSuite, testInspvaAsciiParsing)
   ASSERT_DOUBLE_EQ(1.116219952, msg->roll);
   ASSERT_DOUBLE_EQ(-3.476059035, msg->pitch);
   ASSERT_DOUBLE_EQ(7.372686190, msg->azimuth);
+  ASSERT_EQ("INS_ALIGNMENT_COMPLETE", msg->status);
+}
+
+// TODO: check 
+TEST(ParserTestSuite, testInspvaAsciiParsing)
+{
+  novatel_gps_driver::InsattqsParser parser;
+  std::string sentence_str = "%INSATTQSA,1943,425090.000;1943,425090.000000000,0.706276782,0.001974400,"
+  "-0.001083571,-0.707932225,INS_ALIGNMENT_COMPLETE*552d93f0\r\n";
+  std::string extracted_str;
+
+  novatel_gps_driver::NovatelMessageExtractor extractor;
+
+  std::vector<novatel_gps_driver::NmeaSentence> nmea_sentences;
+  std::vector<novatel_gps_driver::NovatelSentence> novatel_sentences;
+  std::vector<novatel_gps_driver::BinaryMessage> binary_messages;
+  std::string remaining;
+
+  extractor.ExtractCompleteMessages(sentence_str, nmea_sentences, novatel_sentences,
+                                    binary_messages, remaining);
+
+  ASSERT_EQ(0, nmea_sentences.size());
+  ASSERT_EQ(0, binary_messages.size());
+  ASSERT_EQ(1, novatel_sentences.size());
+
+  novatel_gps_driver::NovatelSentence sentence = novatel_sentences.front();
+
+  ASSERT_EQ(parser.GetMessageName() + "A", sentence.id);
+
+  novatel_gps_msgs::InspvaPtr msg = parser.ParseAscii(sentence);
+
+  ASSERT_NE(msg.get(), nullptr);
+
+  ASSERT_EQ(1943, msg->week);
+  ASSERT_DOUBLE_EQ(425090.000, msg->seconds_into_week);
+  ASSERT_DOUBLE_EQ(0.706276782, msg->x);
+  ASSERT_DOUBLE_EQ(0.001974400, msg->y);
+  ASSERT_DOUBLE_EQ(-0.001083571, msg->z);
+  ASSERT_DOUBLE_EQ(-0.707932225, msg->w);
   ASSERT_EQ("INS_ALIGNMENT_COMPLETE", msg->status);
 }
 

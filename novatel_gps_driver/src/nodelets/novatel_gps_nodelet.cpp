@@ -156,6 +156,7 @@
 #include <novatel_gps_msgs/Time.h>
 #include <novatel_gps_msgs/Inspva.h>
 #include <novatel_gps_msgs/Inspvax.h>
+#include <novatel_gps_msgs/Insattqs.h>
 #include <novatel_gps_driver/novatel_gps.h>
 #include <ros/ros.h>
 #include <tf2/LinearMath/Quaternion.h>
@@ -302,6 +303,7 @@ namespace novatel_gps_driver
         insstdev_pub_ = swri::advertise<novatel_gps_msgs::Insstdev>(node, "gps/nova/insstdev", 100);
         inspva_pub_ = swri::advertise<novatel_gps_msgs::Inspva>(node, "gps/nova/inspva", 100);
         inspvax_pub_ = swri::advertise<novatel_gps_msgs::Inspvax>(node, "gps/nova/inspvax", 100);
+        insattqs_pub_ = swri::advertise<novatel_gps_msgs::Insattqs>(node, "gps/nova/insattqs", 100);
         inscov_pub_ = swri::advertise<novatel_gps_msgs::Inscov>(node, "gps/nova/inscov", 100);
       }
 
@@ -599,6 +601,7 @@ namespace novatel_gps_driver
     ros::Publisher inscov_pub_;
     ros::Publisher inspva_pub_;
     ros::Publisher inspvax_pub_;
+    ros::Publisher insattqs_pub_;
     ros::Publisher insstdev_pub_;
     ros::Publisher novatel_imu_pub_;
     ros::Publisher novatel_position_pub_;
@@ -1004,6 +1007,15 @@ namespace novatel_gps_driver
           msg->header.stamp += sync_offset;
           msg->header.frame_id = imu_frame_id_;
           inspvax_pub_.publish(msg);
+        }
+
+        std::vector<novatel_gps_msgs::InsattqsPtr> insattqs_msgs;
+        gps_.GetInsattqsMessages(insattqs_msgs);
+        for (const auto& msg : insattqs_msgs)
+        {
+          msg->header.stamp += sync_offset;
+          msg->header.frame_id = imu_frame_id_;
+          insattqs_pub_.publish(msg);
         }
 
         std::vector<novatel_gps_msgs::InsstdevPtr> insstdev_msgs;

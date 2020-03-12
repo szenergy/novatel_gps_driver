@@ -43,7 +43,7 @@ const std::string novatel_gps_driver::InsattqsParser::GetMessageName() const
   return MESSAGE_NAME;
 }
 
-novatel_gps_msgs::InspattqPtr
+novatel_gps_msgs::InsattqsPtr
 novatel_gps_driver::InsattqsParser::ParseBinary(const novatel_gps_driver::BinaryMessage& bin_msg) noexcept(false)
 {
   if (bin_msg.data_.size() != BINARY_LENGTH)
@@ -52,7 +52,7 @@ novatel_gps_driver::InsattqsParser::ParseBinary(const novatel_gps_driver::Binary
     error << "Unexpected insattqs message size: " << bin_msg.data_.size();
     throw ParseException(error.str());
   }
-  novatel_gps_msgs::InspattqPtr ros_msg = boost::make_shared<novatel_gps_msgs::Insattqs>();
+  novatel_gps_msgs::InsattqsPtr ros_msg = boost::make_shared<novatel_gps_msgs::Insattqs>();
   HeaderParser h_parser;
   ros_msg->novatel_msg_header = h_parser.ParseBinary(bin_msg);
   ros_msg->novatel_msg_header.message_name = GetMessageName();
@@ -111,7 +111,7 @@ novatel_gps_driver::InsattqsParser::ParseBinary(const novatel_gps_driver::Binary
   return ros_msg;
 }
 
-novatel_gps_msgs::InspattqPtr
+novatel_gps_msgs::InsattqsPtr
 novatel_gps_driver::InsattqsParser::ParseAscii(const novatel_gps_driver::NovatelSentence& sentence) noexcept(false)
 {
   if (sentence.body.size() != ASCII_FIELDS)
@@ -120,7 +120,7 @@ novatel_gps_driver::InsattqsParser::ParseAscii(const novatel_gps_driver::Novatel
     error << "Unexpected number of fields in INSATTQS log: " << sentence.body.size();
     throw ParseException(error.str());
   }
-  novatel_gps_msgs::InspattqPtr msg = boost::make_shared<novatel_gps_msgs::Insattqs>();
+  novatel_gps_msgs::InsattqsPtr msg = boost::make_shared<novatel_gps_msgs::Insattqs>();
   HeaderParser h_parser;
   msg->novatel_msg_header = h_parser.ParseAscii(sentence);
 

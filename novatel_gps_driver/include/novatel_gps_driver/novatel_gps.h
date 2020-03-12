@@ -220,9 +220,9 @@ namespace novatel_gps_driver
        */
       void GetInsattqsMessages(std::vector<novatel_gps_msgs::InsattqsPtr>& insattqs_messages);
       /**
-       * @brief Provides any INSATTQSX messages that have been received since the last
+       * @brief Provides any INSATTQS messages that have been received since the last
        * time this was called.
-       * @param[out] insattqsx_messages New INSATTQSX messages.
+       * @param[out] insattqs_messages New INSATTQS messages.
        */
       void GetInsstdevMessages(std::vector<novatel_gps_msgs::InsstdevPtr>& insstdev_messages);
       /**
