@@ -117,6 +117,8 @@ namespace novatel_gps_driver
     static const std::string NMEA_SENTENCE_FLAG;
     /// Indicates the beginning of an ASCII NovAtel message
     static const std::string NOVATEL_SENTENCE_FLAG;
+    /// Indicates the beginning of an ASCII short NovAtel message
+    static const std::string NOVATEL_SHORT_SENTENCE_FLAG;
     /// Used to search for both types of ASCII messages
     static const std::string NOVATEL_ASCII_FLAGS;
     /// Indicates the beginning of a binary NovAtel message

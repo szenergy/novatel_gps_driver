@@ -160,6 +160,7 @@
 #include <novatel_gps_driver/novatel_gps.h>
 #include <ros/ros.h>
 #include <tf2/LinearMath/Quaternion.h>
+#include <angles/angles.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -883,15 +884,17 @@ namespace novatel_gps_driver
         gps_.GetNovatelHeading2Messages(heading2_msgs);
         for (const auto& msg : heading2_msgs)
         {
+          /*
           tf2::Quaternion oriQuater;
-          oriQuater.setRPY( 0, msg->pitch, msg->heading ); 
+          oriQuater.setRPY( 0, angles::from_degrees(msg->pitch), angles::from_degrees(msg->heading)); 
           oriQuater.normalize();
-          msg->header.stamp += sync_offset;
-          msg->header.frame_id = frame_id_;
           pose.pose.orientation.w = oriQuater.getW();
           pose.pose.orientation.x = oriQuater.getX();
           pose.pose.orientation.x = oriQuater.getY();
           pose.pose.orientation.z = oriQuater.getZ();
+          */
+          msg->header.stamp += sync_offset;
+          msg->header.frame_id = frame_id_;
           novatel_heading2_pub_.publish(msg);
         }
       }
@@ -997,6 +1000,22 @@ namespace novatel_gps_driver
         {
           msg->header.stamp += sync_offset;
           msg->header.frame_id = imu_frame_id_;
+          tf2::Quaternion oriQuater, oriRot, oriNew;
+          double R = angles::from_degrees(msg->roll)  * -1;
+          double P = angles::from_degrees(msg->pitch)  * -1;
+          double Y = angles::from_degrees(msg->azimuth) - M_PI;
+          oriQuater.setRPY(R,P,Y); 
+          oriRot.setRPY(0.0, 0.0, -M_PI_2);
+          oriNew = oriRot * oriQuater;
+          oriNew.normalize();
+          pose.pose.orientation.w = oriNew.getW() * -1;
+          pose.pose.orientation.x = oriNew.getY();
+          pose.pose.orientation.y = oriNew.getX() * -1;
+          pose.pose.orientation.z = oriNew.getZ();
+          pose.header.frame_id = "nova";
+          msg->roll = R;
+          msg->pitch = P;
+          msg->azimuth = Y;
           inspva_pub_.publish(msg);
         }
 
