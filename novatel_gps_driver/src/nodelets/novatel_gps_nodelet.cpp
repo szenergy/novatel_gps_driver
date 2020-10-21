@@ -630,7 +630,7 @@ namespace novatel_gps_driver
     boost::mutex mutex_;
     
     /// pose message
-    geometry_msgs::PoseStamped pose;
+    geometry_msgs::PoseStamped utmpose;
     /// Subscriber to listen for sync times from a DIO
     swri::Subscriber sync_sub_;
     ros::Time last_sync_;
@@ -868,13 +868,14 @@ namespace novatel_gps_driver
         gps_.GetNovatelUtmPositions(utm_msgs);
         for (const auto& msg : utm_msgs)
         {
-          pose.pose.position.x = msg->easting;
-          pose.pose.position.y = msg->northing;
+          utmpose.pose.position.x = msg->easting;
+          utmpose.pose.position.y = msg->northing;
+          utmpose.pose.position.z = 0.0;
           msg->header.stamp += sync_offset;
-          pose.header.stamp = msg->header.stamp;
+          utmpose.header.stamp = ros::Time::now();//msg->header.stamp;
           msg->header.frame_id = frame_id_;
           novatel_utm_pub_.publish(msg);
-          novatel_utm_pub_pose_.publish(pose);
+          novatel_utm_pub_pose_.publish(utmpose);
         }
       }
 
@@ -884,15 +885,6 @@ namespace novatel_gps_driver
         gps_.GetNovatelHeading2Messages(heading2_msgs);
         for (const auto& msg : heading2_msgs)
         {
-          /*
-          tf2::Quaternion oriQuater;
-          oriQuater.setRPY( 0, angles::from_degrees(msg->pitch), angles::from_degrees(msg->heading)); 
-          oriQuater.normalize();
-          pose.pose.orientation.w = oriQuater.getW();
-          pose.pose.orientation.x = oriQuater.getX();
-          pose.pose.orientation.x = oriQuater.getY();
-          pose.pose.orientation.z = oriQuater.getZ();
-          */
           msg->header.stamp += sync_offset;
           msg->header.frame_id = frame_id_;
           novatel_heading2_pub_.publish(msg);
@@ -1008,11 +1000,11 @@ namespace novatel_gps_driver
           oriRot.setRPY(0.0, 0.0, -M_PI_2);
           oriNew = oriRot * oriQuater;
           oriNew.normalize();
-          pose.pose.orientation.w = oriNew.getW() * -1;
-          pose.pose.orientation.x = oriNew.getY();
-          pose.pose.orientation.y = oriNew.getX() * -1;
-          pose.pose.orientation.z = oriNew.getZ();
-          pose.header.frame_id = "nova";
+          utmpose.pose.orientation.w = oriNew.getW() * -1;
+          utmpose.pose.orientation.x = oriNew.getY();
+          utmpose.pose.orientation.y = oriNew.getX() * -1;
+          utmpose.pose.orientation.z = oriNew.getZ();
+          utmpose.header.frame_id = frame_id_; //"map" 
           msg->roll = R;
           msg->pitch = P;
           msg->azimuth = Y;

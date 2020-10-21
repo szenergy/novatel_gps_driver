@@ -7,7 +7,7 @@
       verbose: false
       publish_diagnostics: false
       connection_type: tcp
-      device: 192.168.1.223:3002
+      device: 192.168.1.11:3002
       imu_sample_rate: -1
       use_binary_messages: true
       publish_novatel_positions: false
@@ -18,7 +18,7 @@
       imu_frame_id: /gps/novatel/imu
       publish_novatel_heading2: true
       publish_nmea_messages: false
-      frame_id: novatel
+      frame_id: map
     </rosparam>
   </node>
 </launch>

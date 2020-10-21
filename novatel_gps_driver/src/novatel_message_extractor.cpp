@@ -49,7 +49,6 @@ namespace novatel_gps_driver
   const std::string NovatelMessageExtractor::HEADER_SEPARATOR = ";";
   const std::string NovatelMessageExtractor::NMEA_SENTENCE_FLAG = "$";
   const std::string NovatelMessageExtractor::NOVATEL_SENTENCE_FLAG = "#";
-  const std::string NovatelMessageExtractor::NOVATEL_SHORT_SENTENCE_FLAG = "%";
   const std::string NovatelMessageExtractor::NOVATEL_ASCII_FLAGS = "$#";
   const std::string NovatelMessageExtractor::NOVATEL_BINARY_SYNC_BYTES = "\xAA\x44\x12";
   const std::string NovatelMessageExtractor::NOVATEL_ENDLINE = "\r\n";
@@ -465,7 +464,6 @@ namespace novatel_gps_driver
               parse_error = true;
             }
           }
-          // or input[ascii_start_idx] == NOVATEL_SHORT_SENTENCE_FLAG[0]
           else if (input[ascii_start_idx] == NOVATEL_SENTENCE_FLAG[0])
           {
             std::string cur_sentence;
