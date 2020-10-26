@@ -963,7 +963,7 @@ namespace novatel_gps_driver
         gps_.GetNovatelCorrectedImuData(novatel_imu_msgs);
         for (const auto& msg : novatel_imu_msgs)
         {
-          msg->header.stamp += sync_offset;
+          msg->header.stamp = ros::Time::now(); // += sync_offset;
           msg->header.frame_id = imu_frame_id_;
           novatel_imu_pub_.publish(msg);
         }
@@ -972,7 +972,7 @@ namespace novatel_gps_driver
         gps_.GetImuMessages(imu_msgs);
         for (const auto& msg : imu_msgs)
         {
-          msg->header.stamp += sync_offset;
+          msg->header.stamp = ros::Time::now(); // += sync_offset;
           msg->header.frame_id = imu_frame_id_;
           imu_pub_.publish(msg);
         }
@@ -1041,7 +1041,7 @@ namespace novatel_gps_driver
 
       for (const auto& msg : fix_msgs)
       {
-        msg->header.stamp += sync_offset;
+        msg->header.stamp = ros::Time::now();//+= sync_offset;
         msg->header.frame_id = frame_id_;
         gps_pub_.publish(msg);
 
